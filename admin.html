@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Luxe Barbershop</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            color: #d4af37;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            color: #aaa;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .stat-card h3 {
+            color: #aaa;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card .value {
+            color: #d4af37;
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+        
+        .section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .section h2 {
+            color: #d4af37;
+            font-size: 1.5rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        th {
+            color: #d4af37;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+        
+        td {
+            color: #eee;
+        }
+        
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .status.confirmed {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4caf50;
+        }
+        
+        .status.cancelled {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+        
+        .btn-primary {
+            background: #d4af37;
+            color: #1a1a2e;
+        }
+        
+        .btn-primary:hover {
+            background: #b8962e;
+        }
+        
+        .btn-edit {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196f3;
+        }
+        
+        .btn-edit:hover {
+            background: #2196f3;
+            color: white;
+        }
+        
+        .btn-cancel {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+        
+        .btn-cancel:hover {
+            background: #f44336;
+            color: white;
+        }
+        
+        .btn-delete {
+            background: rgba(244, 67, 54, 0.3);
+            color: #ff5252;
+        }
+        
+        .btn-delete:hover {
+            background: #ff5252;
+            color: white;
+        }
+        
+        .btn-refresh {
+            background: #d4af37;
+            color: #1a1a2e;
+            margin-bottom: 20px;
+        }
+        
+        .btn-refresh:hover {
+            background: #b8962e;
+        }
+        
+        .nav {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .nav a {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #d4af37;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+        }
+        
+        .nav a:hover {
+            background: #d4af37;
+            color: #1a1a2e;
+        }
+        
+        .btn-logout {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+            border: none;
+        }
+        
+        .btn-logout:hover {
+            background: #f44336;
+            color: white;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            margin: 5% auto;
+            padding: 30px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 15px;
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .modal h3 {
+            color: #d4af37;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: #aaa;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #d4af37;
+        }
+        
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #d4af37;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #aaa;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-buttons .btn {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 Admin Dashboard</h1>
+            <p>Luxe Barbershop Management</p>
+        </header>
+        
+        <nav class="nav">
+            <a href="/">← Back to Booking</a>
+            <a href="/admin">Dashboard</a>
+            <a href="#" class="btn-logout" onclick="logout()">Logout</a>
+        </nav>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Today's Appointments</h3>
+                <div class="value" id="totalAppointments">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Expected Revenue</h3>
+                <div class="value" id="totalRevenue">$0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Total Services</h3>
+                <div class="value" id="totalServices">6</div>
+            </div>
+            <div class="stat-card">
+                <h3>Active Barbers</h3>
+                <div class="value" id="totalBarbers">4</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>📅 Today's Appointments</h2>
+                <button class="btn btn-refresh" onclick="loadAppointments()">🔄 Refresh</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Customer</th>
+                        <th>Contact</th>
+                        <th>Service</th>
+                        <th>Barber</th>
+                        <th>Time</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="appointmentsList">
+                    <tr>
+                        <td colspan="9" class="empty-state">Loading appointments...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>✂️ All Services</h2>
+                <button class="btn btn-primary" onclick="openServiceModal()">+ Add Service</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Service Name</th>
+                        <th>Description</th>
+                        <th>Duration (min)</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="servicesList">
+                    <tr>
+                        <td colspan="6" class="empty-state">Loading services...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>👨‍💼 Our Barbers</h2>
+                <button class="btn btn-primary" onclick="openBarberModal()">+ Add Barber</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Specialty</th>
+                        <th>Image</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="barbersList">
+                    <tr>
+                        <td colspan="5" class="empty-state">Loading barbers...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Service Modal -->
+    <div id="serviceModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeServiceModal()">&times;</span>
+            <h3 id="serviceModalTitle">Add Service</h3>
+            <form id="serviceForm">
+                <input type="hidden" id="serviceId">
+                <div class="form-group">
+                    <label for="serviceName">Service Name *</label>
+                    <input type="text" id="serviceName" required>
+                </div>
+                <div class="form-group">
+                    <label for="serviceDescription">Description</label>
+                    <input type="text" id="serviceDescription">
+                </div>
+                <div class="form-group">
+                    <label for="serviceDuration">Duration (minutes) *</label>
+                    <input type="number" id="serviceDuration" required>
+                </div>
+                <div class="form-group">
+                    <label for="servicePrice">Price ($) *</label>
+                    <input type="number" id="servicePrice" step="0.01" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeServiceModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Barber Modal -->
+    <div id="barberModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeBarberModal()">&times;</span>
+            <h3 id="barberModalTitle">Add Barber</h3>
+            <form id="barberForm" enctype="multipart/form-data">
+                <input type="hidden" id="barberId">
+                <div class="form-group">
+                    <label for="barberName">Name *</label>
+                    <input type="text" id="barberName" required>
+                </div>
+                <div class="form-group">
+                    <label for="barberSpecialty">Specialty</label>
+                    <input type="text" id="barberSpecialty">
+                </div>
+                <div class="form-group">
+                    <label for="barberPhoto">Photo</label>
+                    <input type="file" id="barberPhoto" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="barberImage">Or enter image URL</label>
+                    <input type="text" id="barberImage" placeholder="e.g., images/barbers/photo.jpg">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeBarberModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Appointment Modal -->
+    <div id="appointmentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeAppointmentModal()">&times;</span>
+            <h3>Edit Appointment</h3>
+            <form id="appointmentForm">
+                <input type="hidden" id="appointmentId">
+                <div class="form-group">
+                    <label for="appointmentCustomer">Customer Name *</label>
+                    <input type="text" id="appointmentCustomer" required>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentPhone">Phone *</label>
+                    <input type="text" id="appointmentPhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentEmail">Email</label>
+                    <input type="email" id="appointmentEmail">
+                </div>
+                <div class="form-group">
+                    <label for="appointmentService">Service *</label>
+                    <select id="appointmentService" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentBarber">Barber *</label>
+                    <select id="appointmentBarber" required></select>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentDate">Date *</label>
+                    <input type="date" id="appointmentDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentTime">Time *</label>
+                    <input type="time" id="appointmentTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="appointmentStatus">Status</label>
+                    <select id="appointmentStatus">
+                        <option value="confirmed">Confirmed</option>
+                        <option value="cancelled">Cancelled</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-cancel" onclick="closeAppointmentModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        let servicesData = [];
+        let barbersData = [];
+        
+        // Check authentication on load
+        async function checkAuth() {
+            try {
+                const response = await fetch('/api/check-auth');
+                const data = await response.json();
+                
+                if (!data.authenticated) {
+                    window.location.href = '/admin';
+                }
+            } catch (error) {
+                window.location.href = '/admin';
+            }
+        }
+        
+        async function loadDashboard() {
+            await checkAuth();
+            await Promise.all([
+                loadAppointments(),
+                loadServices(),
+                loadBarbers()
+            ]);
+        }
+        
+        async function loadAppointments() {
+            try {
+                const response = await fetch('/api/dashboard');
+                if (response.status === 401) {
+                    window.location.href = '/admin';
+                    return;
+                }
+                const data = await response.json();
+                
+                document.getElementById('totalAppointments').textContent = data.appointments.length;
+                document.getElementById('totalRevenue').textContent = '$' + (data.summary.revenue || 0);
+                
+                const tbody = document.getElementById('appointmentsList');
+                
+                if (data.appointments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" class="empty-state">No appointments today</td></tr>';
+                    return;
+                }
+                
+                tbody.innerHTML = data.appointments.map(apt => `
+                    <tr>
+                        <td>#${apt.id}</td>
+                        <td>${apt.customer_name}</td>
+                        <td>${apt.customer_phone}<br><small>${apt.customer_email || ''}</small></td>
+                        <td>${apt.service_name}</td>
+                        <td>${apt.barber_name}</td>
+                        <td>${apt.time}</td>
+                        <td>$${apt.price}</td>
+                        <td><span class="status ${apt.status}">${apt.status}</span></td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit" onclick="openAppointmentModal(${apt.id}, '${apt.customer_name}', '${apt.customer_phone}', '${apt.customer_email || ''}', ${apt.service_id}, ${apt.barber_id}, '${apt.date}', '${apt.time}', '${apt.status}')">Edit</button>
+                            ${apt.status !== 'cancelled' ? 
+                                `<button class="btn btn-cancel" onclick="cancelAppointment(${apt.id})">Cancel</button>` 
+                                : ''}
+                            <button class="btn btn-delete" onclick="deleteAppointment(${apt.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading appointments:', error);
+            }
+        }
+        
+        async function loadServices() {
+            try {
+                const response = await fetch('/api/services');
+                const services = await response.json();
+                servicesData = services;
+                
+                document.getElementById('totalServices').textContent = services.length;
+                
+                const tbody = document.getElementById('servicesList');
+                tbody.innerHTML = services.map(service => `
+                    <tr>
+                        <td>${service.id}</td>
+                        <td>${service.name}</td>
+                        <td>${service.description || '-'}</td>
+                        <td>${service.duration}</td>
+                        <td>$${service.price}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit" onclick="openServiceModal(${service.id}, '${service.name}', '${service.description || ''}', ${service.duration}, ${service.price})">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteService(${service.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading services:', error);
+            }
+        }
+        
+        async function loadBarbers() {
+            try {
+                const response = await fetch('/api/barbers');
+                const barbers = await response.json();
+                barbersData = barbers;
+                
+                document.getElementById('totalBarbers').textContent = barbers.length;
+                
+                const tbody = document.getElementById('barbersList');
+                tbody.innerHTML = barbers.map(barber => `
+                    <tr>
+                        <td>${barber.id}</td>
+                        <td>${barber.name}</td>
+                        <td>${barber.specialty || '-'}</td>
+                        <td>${barber.image || '-'}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-edit" onclick="openBarberModal(${barber.id}, '${barber.name}', '${barber.specialty || ''}', '${barber.image || ''}')">Edit</button>
+                            <button class="btn btn-delete" onclick="deleteBarber(${barber.id})">Delete</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error loading barbers:', error);
+            }
+        }
+        
+        // Service Modal Functions
+        function openServiceModal(id = null, name = '', description = '', duration = '', price = '') {
+            const modal = document.getElementById('serviceModal');
+            const title = document.getElementById('serviceModalTitle');
+            
+            document.getElementById('serviceId').value = id || '';
+            document.getElementById('serviceName').value = name;
+            document.getElementById('serviceDescription').value = description;
+            document.getElementById('serviceDuration').value = duration;
+            document.getElementById('servicePrice').value = price;
+            
+            title.textContent = id ? 'Edit Service' : 'Add Service';
+            modal.style.display = 'block';
+        }
+        
+        function closeServiceModal() {
+            document.getElementById('serviceModal').style.display = 'none';
+        }
+        
+        document.getElementById('serviceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('serviceId').value;
+            const data = {
+                name: document.getElementById('serviceName').value,
+                description: document.getElementById('serviceDescription').value,
+                duration: parseInt(document.getElementById('serviceDuration').value),
+                price: parseFloat(document.getElementById('servicePrice').value)
+            };
+            
+            try {
+                const url = id ? `/api/services/${id}` : '/api/services';
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    closeServiceModal();
+                    loadServices();
+                } else {
+                    alert('Failed to save service');
+                }
+            } catch (error) {
+                console.error('Error saving service:', error);
+            }
+        });
+        
+        async function deleteService(id) {
+            if (!confirm('Are you sure you want to delete this service?')) return;
+            
+            try {
+                const response = await fetch(`/api/services/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadServices();
+                } else {
+                    alert('Failed to delete service');
+                }
+            } catch (error) {
+                console.error('Error deleting service:', error);
+            }
+        }
+        
+        // Barber Modal Functions
+        function openBarberModal(id = null, name = '', specialty = '', image = '') {
+            const modal = document.getElementById('barberModal');
+            const title = document.getElementById('barberModalTitle');
+            
+            document.getElementById('barberId').value = id || '';
+            document.getElementById('barberName').value = name;
+            document.getElementById('barberSpecialty').value = specialty;
+            document.getElementById('barberImage').value = image;
+            document.getElementById('barberPhoto').value = ''; // Clear file input
+            
+            title.textContent = id ? 'Edit Barber' : 'Add Barber';
+            modal.style.display = 'block';
+        }
+        
+        function closeBarberModal() {
+            document.getElementById('barberModal').style.display = 'none';
+        }
+        
+        document.getElementById('barberForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('barberId').value;
+            const formData = new FormData();
+            formData.append('name', document.getElementById('barberName').value);
+            formData.append('specialty', document.getElementById('barberSpecialty').value);
+            formData.append('image', document.getElementById('barberImage').value);
+            
+            // Add file if selected
+            const photoInput = document.getElementById('barberPhoto');
+            if (photoInput.files.length > 0) {
+                formData.append('photo', photoInput.files[0]);
+            }
+            
+            try {
+                const url = id ? `/api/barbers/${id}` : '/api/barbers';
+                const method = id ? 'PUT' : 'POST';
+                
+                const response = await fetch(url, {
+                    method: method,
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    closeBarberModal();
+                    loadBarbers();
+                } else {
+                    const data = await response.json();
+                    alert(data.error || 'Failed to save barber');
+                }
+            } catch (error) {
+                console.error('Error saving barber:', error);
+            }
+        });
+        
+        async function deleteBarber(id) {
+            if (!confirm('Are you sure you want to delete this barber?')) return;
+            
+            try {
+                const response = await fetch(`/api/barbers/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadBarbers();
+                } else {
+                    alert('Failed to delete barber');
+                }
+            } catch (error) {
+                console.error('Error deleting barber:', error);
+            }
+        }
+        
+        // Appointment Modal Functions
+        function openAppointmentModal(id, customerName, phone, email, serviceId, barberId, date, time, status) {
+            const modal = document.getElementById('appointmentModal');
+            
+            // Populate service dropdown
+            const serviceSelect = document.getElementById('appointmentService');
+            serviceSelect.innerHTML = servicesData.map(s => 
+                `<option value="${s.id}" ${s.id === serviceId ? 'selected' : ''}>${s.name} - $${s.price}</option>`
+            ).join('');
+            
+            // Populate barber dropdown
+            const barberSelect = document.getElementById('appointmentBarber');
+            barberSelect.innerHTML = barbersData.map(b => 
+                `<option value="${b.id}" ${b.id === barberId ? 'selected' : ''}>${b.name}</option>`
+            ).join('');
+            
+            document.getElementById('appointmentId').value = id;
+            document.getElementById('appointmentCustomer').value = customerName;
+            document.getElementById('appointmentPhone').value = phone;
+            document.getElementById('appointmentEmail').value = email;
+            document.getElementById('appointmentService').value = serviceId;
+            document.getElementById('appointmentBarber').value = barberId;
+            document.getElementById('appointmentDate').value = date;
+            document.getElementById('appointmentTime').value = time;
+            document.getElementById('appointmentStatus').value = status;
+            
+            modal.style.display = 'block';
+        }
+        
+        function closeAppointmentModal() {
+            document.getElementById('appointmentModal').style.display = 'none';
+        }
+        
+        document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const id = document.getElementById('appointmentId').value;
+            const data = {
+                customer_name: document.getElementById('appointmentCustomer').value,
+                customer_phone: document.getElementById('appointmentPhone').value,
+                customer_email: document.getElementById('appointmentEmail').value,
+                service_id: parseInt(document.getElementById('appointmentService').value),
+                barber_id: parseInt(document.getElementById('appointmentBarber').value),
+                date: document.getElementById('appointmentDate').value,
+                time: document.getElementById('appointmentTime').value,
+                status: document.getElementById('appointmentStatus').value
+            };
+            
+            try {
+                const response = await fetch(`/api/appointments/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    closeAppointmentModal();
+                    loadAppointments();
+                } else {
+                    alert('Failed to update appointment');
+                }
+            } catch (error) {
+                console.error('Error updating appointment:', error);
+            }
+        });
+        
+        async function cancelAppointment(id) {
+            if (!confirm('Are you sure you want to cancel this appointment?')) return;
+            
+            try {
+                const response = await fetch(`/api/appointments/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.status === 401) {
+                    window.location.href = '/admin';
+                    return;
+                }
+                
+                if (response.ok) {
+                    loadAppointments();
+                } else {
+                    alert('Failed to cancel appointment');
+                }
+            } catch (error) {
+                console.error('Error cancelling appointment:', error);
+            }
+        }
+        
+        async function deleteAppointment(id) {
+            if (!confirm('Are you sure you want to permanently delete this appointment?')) return;
+            
+            try {
+                const response = await fetch(`/api/appointments/${id}`, {
+                    method: 'DELETE'
+                });
+                
+                if (response.ok) {
+                    loadAppointments();
+                } else {
+                    alert('Failed to delete appointment');
+                }
+            } catch (error) {
+                console.error('Error deleting appointment:', error);
+            }
+        }
+        
+        async function logout() {
+            try {
+                await fetch('/api/logout', { method: 'POST' });
+                window.location.href = '/admin';
+            } catch (error) {
+                console.error('Error logging out:', error);
+            }
+        }
+        
+        // Close modals when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+        
+        // Load all data on page load
+        loadDashboard();
+    </script>
+</body>
+</html>
